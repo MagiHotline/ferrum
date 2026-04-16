@@ -1,7 +1,21 @@
-[package]
-name = "ferrum"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
+members = [
+    "crates/ferrum",
+    "crates/core",
+    "crates/io",
+    "crates/scenes",
+    "crates/projects"
+]
 
-[dependencies]
-objc2-metal = "0.3.2"
+# common dependencies across all crates
+[workspace.dependencies]
+objc2 = "0.5.2"
+objc2-metal = { version = "0.3.2", features = [
+    "MTLDevice",
+    "MTLCommandQueue",
+    "MTLCommandBuffer",
+    "MTLCommandEncoder",
+    "MTLLibrary"
+] }
+objc2-foundation = "0.2.2"

@@ -1,3 +1,4 @@
+// ; entrypoint
 use objc2_metal::{MTLCreateSystemDefaultDevice, MTLDevice};
 
 fn main() {

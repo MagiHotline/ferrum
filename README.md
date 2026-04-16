@@ -4,11 +4,11 @@
 
 # FAQ
 
-## Why Ferrum? 
+## Why the name "Ferrum"? 
 
 Ferrum is the latin word for Iron. It's a play of words of using Metal in Rust.
 
-## Was this insipired of other projects?
+## Was this insipired by other projects?
 
 This project is heavily inspired by [swaptube](https://github.com/2swap/swaptube) a video renderer
 made by 2swap. Instead of using CUDA C I wanted to use Metal to fully exploit the M-series chips for graphics.

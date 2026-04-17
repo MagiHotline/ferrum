@@ -5,7 +5,8 @@ members = [
     "crates/core",
     "crates/io",
     "crates/scenes",
-    "crates/projects"
+    "crates/projects",
+    "crates/shared"
 ]
 
 # common dependencies across all crates

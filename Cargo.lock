@@ -99,3 +99,7 @@ version = "0.1.0"
 [[package]]
 name = "scenes"
 version = "0.1.0"
+
+[[package]]
+name = "shared"
+version = "0.1.0"

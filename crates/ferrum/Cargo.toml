@@ -4,4 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+glfw.workspace = true
 objc2-metal.workspace = true
+objc2.workspace = true
+objc2-quartz-core.workspace = true
+objc2-app-kit.workspace = true

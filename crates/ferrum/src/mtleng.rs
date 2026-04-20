@@ -18,7 +18,6 @@ pub struct MTLEngine {
 }
 
 impl MTLEngine {
-
     pub unsafe fn new() -> Self {
         glfwInit();
         // Tell GLFW to not create OPENGL graphics context

@@ -4,15 +4,9 @@ using namespace metal;
 
 vertex float4 vertexShader(
     uint vertexID [[vertex_id]],
-    constant simd::float3* vertexPositions)
-{
-    float4 vertexOutPositions = float4(
-        vertexPositions[vertexID][0],
-        vertexPositions[vertexID][1],
-        vertexPositions[vertexID][2],
-        1.0f
-    );
-
+    device packed_float3 *vertices [[buffer(0)]]
+) {
+    float4 vertexOutPositions = float4(vertices[vertexID], 1.0);
     return vertexOutPositions;
 }
 

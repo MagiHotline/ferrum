@@ -10,6 +10,13 @@ use objc2_metal::{MTLBuffer, MTLCommandBuffer, MTLCommandEncoder, MTLCommandQueu
     MTLResourceOptions, MTLStoreAction, MTLViewport};
 use objc2::{Encode, rc::Retained, runtime::ProtocolObject};
 use objc2_quartz_core::{CAMetalDrawable, CAMetalLayer};
+use shared::math;
+
+pub enum WindowSize {
+    Fullscreen,
+    Windowed
+}
+
 
 pub struct MTLEngine {
     glfw: glfw::Glfw,
@@ -27,20 +34,38 @@ pub struct MTLEngine {
 
 impl MTLEngine {
 
-    pub fn new() -> Self {
+    pub fn new(
+        width: u32,
+        height: u32,
+        title: &str,
+        window_mode: WindowSize
+    ) -> Self {
         let mut glfw = glfw::init(glfw::fail_on_errors).expect("Failed to init glfw");
         // Tell GLFW to not create OPENGL graphics context
         glfw::WindowHint::ClientApi(glfw::ClientApiHint::NoApi);
         // HARDCODED WIDHT AND LENGTH FOR NOW
-        let (mut glfw_window, events) = glfw.create_window(
-            800, 600,
-            "Metal Window",
-            WindowMode::Windowed
-        ).expect("Failed to create window.");
+        let (mut glfw_window, events) =
+            match window_mode {
+                WindowSize::Fullscreen => glfw.with_primary_monitor(|glfw, m| {
+                    glfw.create_window(
+                        width,
+                        height,
+                        title,
+                        m.map_or(glfw::WindowMode::Windowed, |m| {
+                            glfw::WindowMode::FullScreen(m)
+                        }),
+                    )
+                    .expect("Failed to create window")
+                }),
+                WindowSize::Windowed =>
+                glfw.create_window(width, height, title, WindowMode::Windowed)
+                    .expect("Failed to create window")
+            };
+
 
         glfw_window.set_framebuffer_size_polling(true);
 
-        let (width, height) = glfw_window.get_framebuffer_size();
+        let (width_screen, height_height) = glfw_window.get_framebuffer_size();
 
         let device =
             MTLCreateSystemDefaultDevice()
@@ -55,7 +80,7 @@ impl MTLEngine {
         let metal_layer = CAMetalLayer::new();
         metal_layer.setDevice(Some(&device));
         metal_layer.setPixelFormat(MTLPixelFormat::BGRA8Unorm);
-        metal_layer.setDrawableSize(CGSize::new(width as f64, height as f64));
+        metal_layer.setDrawableSize(CGSize::new(width_screen as f64, height_height as f64));
         metal_window.contentView().unwrap().setLayer(Some(&metal_layer));
         metal_window.contentView().unwrap().setWantsLayer(true);
 
@@ -138,6 +163,7 @@ impl MTLEngine {
             }
 
             // drawing
+            // FIX: REZING THE WINDOW DOES NOT DRAW THE TRIANGLE ONCE AGAIN
             self.metal_drawable = self.metal_layer.nextDrawable().expect("Failed to get drawable");
             MTLEngine::send_render_command(self);
         }

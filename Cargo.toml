@@ -9,10 +9,21 @@ members = [
     "crates/shared"
 ]
 
+[workspace.lints.rust]
+unused_imports = "warn"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+
 # common dependencies across all crates
 [workspace.dependencies]
-glfw = "0.62.0"
+shared = { path = "./crates/shared" }
+ferrum = { path = "./crates/ferrum" }
+
+glfw = { version = "0.62.0", features = ["all"] }
 objc2 = "0.6.4"
 objc2-metal = "0.3.2"
 objc2-quartz-core = "0.3.2"
 objc2-app-kit = "0.3.2"
+objc2-foundation = "0.3.2"

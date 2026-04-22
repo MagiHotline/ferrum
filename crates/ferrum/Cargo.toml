@@ -3,9 +3,16 @@ name = "ferrum"
 version = "0.1.0"
 edition = "2021"
 
+[lints]
+workspace = true
+
 [dependencies]
-glfw.workspace = true
-objc2-metal.workspace = true
-objc2.workspace = true
-objc2-quartz-core.workspace = true
-objc2-app-kit.workspace = true
+shared = { workspace = true }
+
+glfw = { workspace = true }
+objc2-metal = { workspace = true }
+objc2 = { workspace = true }
+objc2-quartz-core = { workspace = true }
+objc2-app-kit = { workspace = true }
+objc2-foundation = { workspace = true }
+glam = "0.32.1"

@@ -2,7 +2,7 @@
 
 using namespace metal;
 
-vertex float4 vertex(
+vertex float4 vertexShader(
     uint vertexID [[vertex_id]],
     constant simd::float3* vertexPositions)
 {

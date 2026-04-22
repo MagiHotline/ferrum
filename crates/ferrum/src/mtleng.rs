@@ -1,10 +1,9 @@
-use std::{ffi::c_void, fs, ptr::{NonNull, null_mut}};
-
+use std::{ffi::c_void, fs, ops::Deref, ptr::NonNull};
 use glam::Mat3;
 use glfw::{GlfwReceiver, PWindow, WindowEvent, WindowMode};
 use objc2_app_kit::NSWindow;
-use objc2_foundation::NSString;
-use objc2_metal::{MTLBuffer, MTLCompileOptions, MTLCreateSystemDefaultDevice, MTLDevice, MTLLibrary, MTLPixelFormat, MTLResourceOptions};
+use objc2_foundation::{NSError, NSString};
+use objc2_metal::{MTLBuffer, MTLCommandQueue, MTLCompileOptions, MTLCreateSystemDefaultDevice, MTLDevice, MTLLibrary, MTLPixelFormat, MTLRenderPipelineDescriptor, MTLRenderPipelineState, MTLResourceOptions};
 use objc2::{rc::Retained, runtime::ProtocolObject};
 use objc2_quartz_core::CAMetalLayer;
 // Only OBJ-C objects need Retained
@@ -17,7 +16,9 @@ pub struct MTLEngine {
     metal_window: Retained<NSWindow>,
     metal_layer: Retained<CAMetalLayer>,
     metal_library: Retained<ProtocolObject<dyn MTLLibrary>>,
-    metal_buffer: Retained<ProtocolObject<dyn MTLBuffer>>
+    metal_buffer: Retained<ProtocolObject<dyn MTLBuffer>>,
+    metal_cmdq: Retained<ProtocolObject<dyn MTLCommandQueue>>,
+    metal_renderer_pso: Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>
 }
 
 impl MTLEngine {
@@ -53,12 +54,37 @@ impl MTLEngine {
         let metal_buffer =
             MTLEngine::create_triangle(&device);
 
-        let shader_source = include_str!("shmet/triangle.metal");
-        let source_ns = NSString::from_str(&shader_source);
+        // Compile all metal files
+        let entries = fs::read_dir("crates/ferrum/src/shmet")
+                .expect("Could not find shader directory");
+
+        let mut combined_source = String::new();
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let path = entry.path();
+
+                if path.extension().and_then(|s| s.to_str()) == Some("metal") {
+                    let content = fs::read_to_string(&path)
+                        .expect(&format!("Could not read shader file: {:?}", path));
+
+                    combined_source.push_str(&content);
+                    combined_source.push_str("\n");
+                }
+            }
+        }
+
+        let source_ns = NSString::from_str(&combined_source);
         let options = MTLCompileOptions::new();
         let metal_library =
             device.newLibraryWithSource_options_error(&source_ns, Some(&options))
                 .expect("Failed to compile Metal shaders at runtime");
+
+        let metal_cmdq =
+            device.newCommandQueue()
+            .expect("Failed to create command queue");
+
+        let metal_renderer_pso =
+            MTLEngine::create_render_pipeline(&metal_library, &metal_layer, &device);
 
         Self
         {
@@ -69,7 +95,9 @@ impl MTLEngine {
             metal_window,
             metal_layer,
             metal_library,
-            metal_buffer
+            metal_buffer,
+            metal_cmdq,
+            metal_renderer_pso
         }
     }
 
@@ -102,6 +130,50 @@ impl MTLEngine {
         }.expect("Unable to create the vertex buffer.");
 
         triangle_vertex_buff
+    }
+
+    pub fn create_render_pipeline(
+        metal_library: &Retained<ProtocolObject<dyn MTLLibrary>>,
+        metal_layer: &Retained<CAMetalLayer>,
+        device: &Retained<ProtocolObject<dyn MTLDevice>>
+    )
+    -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>
+    {
+        let vertex_shader =
+            metal_library.newFunctionWithName(
+                &NSString::from_str("vertexShader")
+        ).expect("Failed to get vertex shader");
+        let fragment_shader =
+            metal_library.newFunctionWithName(
+                &NSString::from_str("fragmentShader")
+        ).expect("Failed to get fragment shader");
+
+        let renderer_pipeline_descriptor =
+            MTLRenderPipelineDescriptor::new();
+
+        // Load the descriptor with label and vertex + fragment function
+        renderer_pipeline_descriptor.setLabel(
+            Some(&NSString::from_str("Triangle Rendering Pipeline"))
+        );
+        renderer_pipeline_descriptor.setVertexFunction(
+            Some(&vertex_shader)
+        );
+        renderer_pipeline_descriptor.setFragmentFunction(
+            Some(&fragment_shader)
+        );
+
+        unsafe {
+            renderer_pipeline_descriptor
+            .colorAttachments()
+            .objectAtIndexedSubscript(0)
+            .setPixelFormat(metal_layer.pixelFormat())
+        };
+
+        // we only need one renderer pipeline state for now, but we can create more
+        let metal_renderer_pso =
+            device.newRenderPipelineStateWithDescriptor_error(&renderer_pipeline_descriptor);
+
+        metal_renderer_pso
     }
 
 }

@@ -337,6 +337,7 @@ dependencies = [
  "objc2-core-foundation",
  "objc2-foundation",
  "objc2-metal",
+ "objc2-metal-kit",
  "objc2-quartz-core",
 ]
 
@@ -813,6 +814,33 @@ dependencies = [
  "dispatch2",
  "objc2 0.6.4",
  "objc2-core-foundation",
+ "objc2-foundation",
+]
+
+[[package]]
+name = "objc2-metal-kit"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "663ef60fd5ddeefb1ddf50be71517ce0f7c782ed22f9569edbed00d5aadefb0d"
+dependencies = [
+ "block2",
+ "objc2 0.6.4",
+ "objc2-app-kit",
+ "objc2-core-foundation",
+ "objc2-core-graphics",
+ "objc2-foundation",
+ "objc2-metal",
+ "objc2-model-io",
+ "objc2-quartz-core",
+]
+
+[[package]]
+name = "objc2-model-io"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b66ef3f1d5bb19a6ef84be8626f0424ad5c1caddd8ed7ac742cbafc1a879aee"
+dependencies = [
+ "objc2 0.6.4",
  "objc2-foundation",
 ]
 

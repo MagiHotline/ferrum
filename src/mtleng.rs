@@ -2,15 +2,14 @@ use std::{ffi::c_void, fs, ptr::NonNull};
 use glam::Mat3;
 use glfw::{GlfwReceiver, PWindow, WindowEvent, WindowMode};
 use objc2_app_kit::NSWindow;
-use objc2_core_foundation::CGSize;
+use objc2_core_foundation::{CGPoint, CGRect, CGSize};
 use objc2_foundation::{NSError, NSString};
 use objc2_metal::{MTLBuffer, MTLCommandBuffer, MTLCommandEncoder, MTLCommandQueue, MTLCompileOptions,
     MTLCreateSystemDefaultDevice, MTLDevice, MTLLibrary, MTLLoadAction, MTLPixelFormat, MTLPrimitiveType,
     MTLRenderCommandEncoder, MTLRenderPassDescriptor, MTLRenderPipelineDescriptor, MTLRenderPipelineState,
     MTLResourceOptions, MTLStoreAction, MTLViewport};
-use objc2::{Encode, rc::Retained, runtime::ProtocolObject};
-use objc2_quartz_core::{CAMetalDrawable, CAMetalLayer};
-use shared::math;
+use objc2::{rc::Retained, runtime::ProtocolObject};
+use objc2_quartz_core::{CAAutoresizingMask, CAMetalDrawable, CAMetalLayer};
 
 pub enum WindowSize {
     Fullscreen,
@@ -43,7 +42,6 @@ impl MTLEngine {
         let mut glfw = glfw::init(glfw::fail_on_errors).expect("Failed to init glfw");
         // Tell GLFW to not create OPENGL graphics context
         glfw::WindowHint::ClientApi(glfw::ClientApiHint::NoApi);
-        // HARDCODED WIDHT AND LENGTH FOR NOW
         let (mut glfw_window, events) =
             match window_mode {
                 WindowSize::Fullscreen => glfw.with_primary_monitor(|glfw, m| {
@@ -80,6 +78,7 @@ impl MTLEngine {
         let metal_layer = CAMetalLayer::new();
         metal_layer.setDevice(Some(&device));
         metal_layer.setPixelFormat(MTLPixelFormat::BGRA8Unorm);
+
         metal_layer.setDrawableSize(CGSize::new(width_screen as f64, height_height as f64));
         metal_window.contentView().unwrap().setLayer(Some(&metal_layer));
         metal_window.contentView().unwrap().setWantsLayer(true);
@@ -89,7 +88,7 @@ impl MTLEngine {
             MTLEngine::create_triangle(&device);
 
         // Compile all metal files
-        let entries = fs::read_dir("crates/ferrum/src/shmet")
+        let entries = fs::read_dir("src/shmet")
                 .expect("Could not find shader directory");
 
         let mut combined_source = String::new();
@@ -153,7 +152,6 @@ impl MTLEngine {
                         self.glfw_window.set_should_close(true);
                     }
                     glfw::WindowEvent::FramebufferSize(width, height) => {
-                        println!("Resizing Metal drawable to {}x{}", width, height);
                         self.metal_layer.setDrawableSize(
                             CGSize { width: width as f64, height: height as f64 }
                         );

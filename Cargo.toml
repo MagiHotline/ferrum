@@ -1,26 +1,9 @@
-[workspace]
-resolver = "2"
-members = [
-    "crates/ferrum",
-    "crates/core",
-    "crates/io",
-    "crates/scenes",
-    "crates/projects",
-    "crates/shared"
-]
+[package]
+name = "ferrum"
+version = "0.1.0"
+edition = "2024"
 
-[workspace.lints.rust]
-unused_imports = "warn"
-
-[workspace.lints.clippy]
-all = "warn"
-pedantic = "warn"
-
-# common dependencies across all crates
-[workspace.dependencies]
-shared = { path = "./crates/shared" }
-ferrum = { path = "./crates/ferrum" }
-
+[dependencies]
 glfw = { version = "0.62.0", features = ["all"] }
 objc2 = "0.6.4"
 objc2-metal = "0.3.2"
@@ -28,3 +11,4 @@ objc2-quartz-core = "0.3.2"
 objc2-app-kit = "0.3.2"
 objc2-foundation = "0.3.2"
 objc2-core-foundation = "0.3.2"
+glam = "0.32.1"

@@ -207,10 +207,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
 
 [[package]]
-name = "core"
-version = "0.1.0"
-
-[[package]]
 name = "crc32fast"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -342,7 +338,6 @@ dependencies = [
  "objc2-foundation",
  "objc2-metal",
  "objc2-quartz-core",
- "shared",
 ]
 
 [[package]]
@@ -475,10 +470,6 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "io"
-version = "0.1.0"
 
 [[package]]
 name = "itertools"
@@ -917,10 +908,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "projects"
-version = "0.1.0"
-
-[[package]]
 name = "pxfm"
 version = "0.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1072,14 +1059,6 @@ name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
-
-[[package]]
-name = "scenes"
-version = "0.1.0"
-
-[[package]]
-name = "shared"
-version = "0.1.0"
 
 [[package]]
 name = "shlex"

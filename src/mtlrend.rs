@@ -1,11 +1,10 @@
-use std::{ffi::c_void, io::{Error, ErrorKind}, ptr::NonNull};
-
+use std::{ffi::c_void, ptr::NonNull};
 use glam::Mat3;
 use objc2::{MainThreadMarker, MainThreadOnly, rc::Retained, runtime::ProtocolObject};
 use objc2_core_foundation::{CGPoint, CGRect, CGSize};
-use objc2_foundation::{NSArray, NSError, NSMutableArray, NSUInteger};
-use objc2_metal::{MTL4ArgumentTable, MTL4ArgumentTableDescriptor, MTL4CommandAllocator, MTL4CommandAllocatorDescriptor, MTL4CommandBuffer, MTL4CommandQueue, MTLBuffer, MTLCreateSystemDefaultDevice, MTLDevice, MTLGPUFamily, MTLLibrary, MTLResidencySet, MTLResidencySetDescriptor, MTLResourceOptions, MTLSharedEvent, MTLViewport};
-use objc2_metal_kit::{MTKView, MTKViewDelegate};
+use objc2_foundation::NSError;
+use objc2_metal::{MTL4ArgumentTable, MTL4ArgumentTableDescriptor, MTL4CommandAllocator, MTL4CommandBuffer, MTL4CommandQueue, MTLBuffer, MTLCreateSystemDefaultDevice, MTLDevice, MTLGPUFamily, MTLLibrary, MTLResidencySet, MTLResidencySetDescriptor, MTLResourceOptions, MTLViewport};
+use objc2_metal_kit::MTKView;
 
 const K_FRAMES_IN_FLIGHT: u8 = 3;
 
@@ -69,8 +68,6 @@ impl MTL4Renderer {
        let viewport_size_buffer =
            device.newBufferWithLength_options(size_of_val(&viewport), MTLResourceOptions::StorageModeManaged)
                .expect("Failed to create the viewport buffer");
-
-
 
         MTL4Renderer {
             device,
@@ -136,8 +133,8 @@ impl MTL4Renderer {
         residency_set
     }
 
-    pub fn make_cmd_allocators(&mut self) {
-        self.device.newCommandAllocator().expect("Failed to create command allocator");
+    pub fn make_cmd_allocators(&mut self) -> Retained<ProtocolObject<dyn MTL4CommandAllocator>> {
+        self.device.newCommandAllocator().expect("Failed to create command allocator")
     }
 
     pub fn render(&mut self) {
